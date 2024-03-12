@@ -32,11 +32,13 @@
     - name: Get API tokenfile
       include_vars: "{{ acm_service_account_tokenfile }}"
 
-    - include_role:
-        name: setup_service_account
-      vars:
-        cluster_address: "{{ ocp_cluster_address }}"
-        repos_path: "{{ remote_repos_path }}"
+    - block:
+      - include_role:
+          name: setup_service_account
+        vars:
+          cluster_address: "{{ ocp_cluster_address }}"
+          repos_path: "{{ remote_repos_path }}"
+      ignore_errors: True
 
     - include_role:
         name: setup_ocp_pipelines_on_acm
