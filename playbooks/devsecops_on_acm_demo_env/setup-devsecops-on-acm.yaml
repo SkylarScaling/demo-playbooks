@@ -1,5 +1,5 @@
 ---
-- name: Setup Image Signing Demo
+- name: Setup DevSecOps Demo
   gather_facts: false
   hosts: localhost
   vars_prompt:
@@ -39,7 +39,7 @@
         repos_path: "{{ remote_repos_path }}"
 
     - include_role:
-        name: setup_acs_on_acm
+        name: setup_ocp_pipelines_on_acm
       vars:
         cluster_address: "{{ ocp_cluster_address }}"
         repos_path: "{{ remote_repos_path }}"

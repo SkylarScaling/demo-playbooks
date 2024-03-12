@@ -1,5 +1,5 @@
 ---
-- name: Setup Image Signing Demo
+- name: Setup ACS on ACM Demo
   gather_facts: false
   hosts: localhost
   vars_prompt:
