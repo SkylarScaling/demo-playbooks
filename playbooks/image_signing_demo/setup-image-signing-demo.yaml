@@ -1,0 +1,159 @@
+---
+- name: Setup Image Signing Demo
+  gather_facts: false
+  hosts: localhost
+  vars_prompt:
+#    # Prompt for cluster name
+#    - name: ocp_cluster_address
+#      prompt: Enter OCP Cluster Name
+#      private: no
+#      confirm: no
+#    # Prompt for cluster-admin username
+#    - name: cluster_admin_user
+#      prompt: Enter cluster-admin user
+#      private: no
+#      confirm: no
+#    # Prompt for cluster-admin password
+#    - name: cluster_admin_password
+#      prompt: Enter cluster-admin password
+#      private: no
+#      confirm: no
+  tasks:
+#    - include_role:
+#        name: "../acs_on_acm_demo_env/roles/setup_acs_on_acm"
+#      vars:
+#        cluster_address: "{{ ocp_cluster_address }}"
+
+    # TODO Install pre-requisites (cosign)
+
+    - name: TODO REMOVE
+      set_fact:
+        ocp_cluster_address: cluster-qsbsx.sandbox366.opentlc.com
+
+    - name: Set infra-config output path
+      set_fact:
+        repos_path: "../../.."
+
+    - name: Get role vars
+      include_vars: "{{ repos_path }}/ansible-for-openshift/playbooks/acm/group_vars/all.yaml"
+
+    - name: Get API tokenfile
+      include_vars: "{{ acm_service_account_tokenfile }}"
+
+    - name: Create demo namespace
+      k8s:
+        host: "https://api.{{ ocp_cluster_address }}:6443"
+        validate_certs: no
+        api_key: "{{ vars[acm_token_var] }}"
+        definition:
+          apiVersion: v1
+          kind: Namespace
+          metadata:
+            name: demo
+
+    # Apply Quay registry secret
+    - name: Create Quay.io registry robot account secret
+      k8s:
+        host: "https://api.{{ ocp_cluster_address }}:6443"
+        validate_certs: no
+        api_key: "{{ vars[acm_token_var] }}"
+        definition:
+          apiVersion: v1
+          kind: Secret
+          metadata:
+            name: image-signing-demo-robot-pull-secret
+            namespace: demo
+          data:
+            .dockerconfigjson: !vault |
+              $ANSIBLE_VAULT;1.1;AES256
+              62313663306466613665316264303761643634343938363236353436313564383537316263313736
+              6334333465656638653930643137376162633734366237390a373438333235633635376462313135
+              65626535393131396235643431316232353633656337616530653661366639306236653737626536
+              3866376638303931350a656364653264313336343865353737363963356330613062303636616361
+              39383633333962356434623238343065373761356438393933373362343732366361646665353034
+              33356239646635303962326532363133373261306434663936623264626166636238303332323166
+              62336437663132626266343235306232383765376530666566326665353637656534653435643134
+              33633963653133313732333264666335383035613962333266643864636132613737626231613130
+              65643933303838356331336134663632366164626462326438323662323531323361616538316639
+              31363365343266656161303735636263323132656231343435393136336335613436393735373130
+              31343666363832336464343735633363333462363463366135316433656630323566393237333335
+              35646265626564393362626463656431646132313237373464323436316362643564326631333865
+              37333534623837616265376436653261383166333131633930353330656435623237646239616338
+              63393133313531396434363765326136656630353036633334653238613362336432363366366365
+              34343232616236343434316239353766323535336636653566623339303238656232633537346430
+              63353263386563613438653139373032373136323836333362323332376565303461636332313162
+              35663031663264656532633935383464613736396639393865373432343066326231323930346639
+              3136333430323964393431386238613637323261336239356132
+          type: kubernetes.io/dockerconfigjson
+
+    - name: Create Pipelines Operator namespace
+      k8s:
+        host: "https://api.{{ ocp_cluster_address }}:6443"
+        validate_certs: no
+        api_key: "{{ vars[acm_token_var] }}"
+        definition:
+          apiVersion: v1
+          kind: Namespace
+          metadata:
+            name: openshift-operators
+
+    - name: Create Pipelines Operator Subscription
+      k8s:
+        host: "https://api.{{ ocp_cluster_address }}:6443"
+        validate_certs: no
+        api_key: "{{ vars[acm_token_var] }}"
+        definition:
+          apiVersion: operators.coreos.com/v1alpha1
+          kind: Subscription
+          metadata:
+            name: openshift-pipelines-operator-rh
+            namespace: openshift-operators
+            labels:
+              operators.coreos.com/openshift-pipelines-operator-rh.openshift-operators: ''
+          spec:
+            channel: pipelines-1.14
+            installPlanApproval: Automatic
+            name: openshift-pipelines-operator-rh
+            source: redhat-operators
+            sourceNamespace: openshift-marketplace
+            startingCSV: openshift-pipelines-operator-rh.v1.14.0
+
+    - name: Link Secret to pipeline Service Account
+      k8s:
+        host: "https://api.{{ ocp_cluster_address }}:6443"
+        validate_certs: no
+        api_key: "{{ vars[acm_token_var] }}"
+        definition:
+          kind: ServiceAccount
+          metadata:
+            namespace: demo
+            name: pipeline
+          secrets:
+            - name: image-signing-demo-robot-pull-secret
+
+#    - name: Get ACS API Token
+#      ansible.builtin.uri:
+#        url: "https://central-stackrox.apps.{{ ocp_cluster_address }}/v1/apitokens/generate"
+#        method: POST
+#        body_format: json
+#        body:
+#          name: image_signing_api_token
+#          role: Admin
+#      register: acs_token
+
+# Create secret
+#kind: Secret
+#apiVersion: v1
+#metadata:
+#  name: roxauthsecret
+#  namespace: demo
+#data:
+#  rox_api_token: ZXlKaGJHY2lPaUpTVXpJMU5pSXNJbXRwWkNJNkltcDNkR3N3SWl3aWRIbHdJam9pU2xkVUluMC5leUpoZFdRaU9sc2lhSFIwY0hNNkx5OXpkR0ZqYTNKdmVDNXBieTlxZDNRdGMyOTFjbU5sY3lOaGNHa3RkRzlyWlc1eklsMHNJbVY0Y0NJNk1UYzBNRFkzT0RFek1Dd2lhV0YwSWpveE56QTVNVFF5TVRNd0xDSnBjM01pT2lKb2RIUndjem92TDNOMFlXTnJjbTk0TG1sdkwycDNkQ0lzSW1wMGFTSTZJakJpWVRJeVpXSmhMVGd5WTJJdE5HUTFZUzA1TWpJNExXWTFaRFkzWmpNeE9XSXlPQ0lzSW01aGJXVWlPaUpwYldGblpWOXphV2R1YVc1bklpd2ljbTlzWlhNaU9sc2lRV1J0YVc0aVhYMC5JcnhWZWluRzJRbktfNDNXdWdKb2NieTlUbFFucC01ZTlRTE9TZFMyMzl6Q1dudkVMUUtFaWhhanV6YTFzYWYxbGw3eVV5aEFfa1VQR2p5NVBEUUVZTEFidXpsMm5TUnBZOEo5ZGNobVlUR1AyVnd1d3dFR3R4UDAteWlWd0hraGctNEN1TnhJSWVvNDR1WDhJZ2FRZWNpc0F0M3VwMzJIRU9faTVEWEtEbEhzak9PZGlpMlozSnFkeE1ITmJqVmFpY3l3T1BtSm5CTXZIUzBQVk00OGh6dk1yM3RQVWZHOXYyRDBpU0hPSGo4U2NjRFluQ3hvS2xMX1hEYzNJbU9ZSHhkV2g2Y2tkRGJ6T0JLdGFKeDk3ZThuUUFVN2JjT191MnBkWk5Ya1Zfdzh5S3p4S0JsRlRmT19CN292REVyUHpvTzZRUHJyZFpLTTNzcUxWcFFjd0xDaXRpU3RPeWdyTncwQlZYSExrZzV3NHlORHVmXzJZN3hQWi1wYWRSVzZ4bmh2VEJXRWFpQWMtLWw1TlZqV0VtY3d2b1BpLWE1VjJrODltWEphUTNBcVBGMUduLUpVc09yZW9Ia00wWHpIT0VKamU4UUVUWEZPQ3RuOWRtZzhqMkxuMWV0SEVGMzhPNHFGQ0dKaGxwRTFIeVR6VnY3Z2F6UmY1bEI2VDRSdFNSdnFHQUpZWkFzcHNpcXN0Y0VxQlQ0XzhTd3Vrdml3ZkxsekdDYmx2WUpHazY3MWVHMU1MSW5MY1ZUWkJSRmNoNE53YTBqdVc4SWM5TVlIUXluUUdNZkx2V0xDRGR0N3AwYzhqWGZJd1RwMXVCdGhHNzlfOThJcWRFTEFMLTd4M3dyejJWY3kwQ3EwRzdGdmxqYmNXM21RWTJuY0VIaHA4cGNpZUJra2NMZw==
+#  rox_central_endpoint: Y2VudHJhbC1zdGFja3JveC5hcHBzLmNsdXN0ZXItcXNic3guc2FuZGJveDM2Ni5vcGVudGxjLmNvbTo0NDM=
+#type: Opaque
+
+
+# Create application pipeline
+
+
+...
