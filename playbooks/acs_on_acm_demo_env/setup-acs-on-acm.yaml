@@ -45,4 +45,25 @@
       vars:
         cluster_address: "{{ ocp_cluster_address }}"
         repos_path: "{{ remote_repos_path }}"
+
+    - name: Wait for stackrox Namespace to be created
+      k8s_info:
+        host: "https://api.{{ ocp_cluster_address }}:6443"
+        validate_certs: no
+        api_key: "{{ vars[acm_token_var] }}"
+        kind: Namespace
+        api_version: v1
+        name: stackrox
+      register: output_info
+      until: output_info.resources | length > 0
+      delay: 2
+      retries: 20
+
+    - name: Create ACS Declarative ConfigMap
+      k8s:
+        host: "https://api.{{ ocp_cluster_address }}:6443"
+        validate_certs: no
+        api_key: "{{ vars[acm_token_var] }}"
+        state: present
+        src: ./files/declarative-configs.yaml
 ...

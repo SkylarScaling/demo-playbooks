@@ -53,6 +53,11 @@
         repos_path: "{{ remote_repos_path }}"
 
     - include_role:
+        name: wait_for_pipelines_operator_install
+      vars:
+        cluster_address: "{{ ocp_cluster_address }}"
+
+    - include_role:
         name: setup_example_pipeline
       vars:
         cluster_address: "{{ ocp_cluster_address }}"
