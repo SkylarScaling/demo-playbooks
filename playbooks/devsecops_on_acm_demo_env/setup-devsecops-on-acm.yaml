@@ -1,5 +1,5 @@
 ---
-- name: Setup ACS on ACM Demo
+- name: Setup DevSecOps Demo
   gather_facts: false
   hosts: localhost
   vars_prompt:
@@ -41,29 +41,24 @@
       ignore_errors: True
 
     - include_role:
-        name: setup_acs_on_acm
+        name: setup_ocp_pipelines_on_acm
       vars:
         cluster_address: "{{ ocp_cluster_address }}"
         repos_path: "{{ remote_repos_path }}"
 
-    - name: Wait for stackrox Namespace to be created
-      k8s_info:
-        host: "https://api.{{ ocp_cluster_address }}:6443"
-        validate_certs: no
-        api_key: "{{ vars[acm_token_var] }}"
-        kind: Namespace
-        api_version: v1
-        name: stackrox
-      register: output_info
-      until: output_info.resources | length > 0
-      delay: 2
-      retries: 20
+    - include_role:
+        name: setup_ocp_gitops_on_acm
+      vars:
+        cluster_address: "{{ ocp_cluster_address }}"
+        repos_path: "{{ remote_repos_path }}"
 
-    - name: Create ACS Declarative ConfigMap
-      k8s:
-        host: "https://api.{{ ocp_cluster_address }}:6443"
-        validate_certs: no
-        api_key: "{{ vars[acm_token_var] }}"
-        state: present
-        src: ./files/declarative-configs.yaml
+    - include_role:
+        name: wait_for_pipelines_operator_install
+      vars:
+        cluster_address: "{{ ocp_cluster_address }}"
+
+    - include_role:
+        name: setup_example_pipeline
+      vars:
+        cluster_address: "{{ ocp_cluster_address }}"
 ...
