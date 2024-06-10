@@ -1,5 +1,5 @@
 ---
-- name: Setup ACS on ACM Demo
+- name: Setup Default OAuth on Clusters
   gather_facts: false
   hosts: localhost
 #  vars_prompt:
@@ -25,7 +25,7 @@
 #        cluster_admin_user: kubeadmin
 #        cluster_admin_password: <password>
 
-    - name: "OpenShift CLI login"
+    - name: "OpenShift Hub Cluster CLI login"
       shell: "oc login -u {{ default_user }} -p {{ default_hub_password }} https://api.{{ hub_cluster_address }}:6443 --insecure-skip-tls-verify"
 
     - include_role:
@@ -33,7 +33,7 @@
       vars:
         cluster_address: "{{ ocp_cluster_address }}"
 
-    - name: "OpenShift CLI login"
+    - name: "OpenShift Managed Cluster CLI login"
       shell: "oc login -u {{ default_user }} -p {{ default_managed_cluster_password }} https://api.{{ managed_cluster_name }}.{{ managed_cluster_base_domain }}:6443 --insecure-skip-tls-verify"
 
     - include_role:
