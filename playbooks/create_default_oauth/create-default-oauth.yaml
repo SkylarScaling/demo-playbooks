@@ -25,13 +25,13 @@
 #        cluster_admin_user: kubeadmin
 #        cluster_admin_password: <password>
 
-#    - name: "OpenShift CLI login"
-#      shell: "oc login -u {{ default_user }} -p {{ default_hub_password }} https://api.{{ hub_cluster_address }}:6443 --insecure-skip-tls-verify"
-#
-#    - include_role:
-#        name: create_default_cluster_admin
-#      vars:
-#        cluster_address: "{{ ocp_cluster_address }}"
+    - name: "OpenShift CLI login"
+      shell: "oc login -u {{ default_user }} -p {{ default_hub_password }} https://api.{{ hub_cluster_address }}:6443 --insecure-skip-tls-verify"
+
+    - include_role:
+        name: create_default_cluster_admin
+      vars:
+        cluster_address: "{{ ocp_cluster_address }}"
 
     - name: "OpenShift CLI login"
       shell: "oc login -u {{ default_user }} -p {{ default_managed_cluster_password }} https://api.{{ managed_cluster_name }}.{{ managed_cluster_base_domain }}:6443 --insecure-skip-tls-verify"
