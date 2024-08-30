@@ -26,18 +26,18 @@
 #        cluster_admin_password: <password>
 
     - name: "OpenShift Hub Cluster CLI login"
-      shell: "oc login -u {{ default_user }} -p {{ default_hub_password }} https://api.{{ hub_cluster_address }}:6443 --insecure-skip-tls-verify"
+      shell: "oc login -u {{ cluster_admin_user }} -p {{ cluster_admin_password }} https://api.{{ ocp_cluster_address }}:6443 --insecure-skip-tls-verify"
 
     - include_role:
         name: create_default_cluster_admin
       vars:
         cluster_address: "{{ ocp_cluster_address }}"
 
-    - name: "OpenShift Managed Cluster CLI login"
-      shell: "oc login -u {{ default_user }} -p {{ default_managed_cluster_password }} https://api.{{ managed_cluster_name }}.{{ managed_cluster_base_domain }}:6443 --insecure-skip-tls-verify"
-
-    - include_role:
-        name: create_default_cluster_admin
-      vars:
-        cluster_address: "{{ managed_cluster_name }}.{{ managed_cluster_base_domain }}"
+#    - name: "OpenShift Managed Cluster CLI login"
+#      shell: "oc login -u {{ default_user }} -p {{ default_managed_cluster_password }} https://api.{{ managed_cluster_name }}.{{ managed_cluster_base_domain }}:6443 --insecure-skip-tls-verify"
+#
+#    - include_role:
+#        name: create_default_cluster_admin
+#      vars:
+#        cluster_address: "{{ managed_cluster_name }}.{{ managed_cluster_base_domain }}"
 ...

@@ -19,10 +19,6 @@
       private: no
       confirm: no
   tasks:
-    - name: Set repos path
-      set_fact:
-        remote_repos_path: "../../.."
-
     - name: "OpenShift CLI login"
       shell: "oc login -u {{ cluster_admin_user }} -p {{ cluster_admin_password }} https://api.{{ ocp_cluster_address }}:6443 --insecure-skip-tls-verify"
 
@@ -37,14 +33,12 @@
           name: setup_service_account
         vars:
           cluster_address: "{{ ocp_cluster_address }}"
-          repos_path: "{{ remote_repos_path }}"
       ignore_errors: True
 
     - include_role:
         name: setup_acs_on_acm
       vars:
         cluster_address: "{{ ocp_cluster_address }}"
-        repos_path: "{{ remote_repos_path }}"
 
     - name: Wait for stackrox Namespace to be created
       k8s_info:
