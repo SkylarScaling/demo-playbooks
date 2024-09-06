@@ -43,18 +43,18 @@
     - include_role:
         name: admin_config_ldap
 
-    - include_role:
-        name: admin_config_machine_pool
+#    - include_role:
+#        name: admin_config_machine_pool
 
-    - include_role:
-        name: install_odf_from_subscription
-      vars:
-        cluster_address: "{{ ocp_cluster_address }}"
+#    - include_role:
+#        name: install_odf_from_subscription
+#      vars:
+#        cluster_address: "{{ ocp_cluster_address }}"
 
-    - include_role:
-        name: install_mco_from_subscription
-      vars:
-        cluster_address: "{{ ocp_cluster_address }}"
+#    - include_role:
+#        name: install_mco_from_subscription
+#      vars:
+#        cluster_address: "{{ ocp_cluster_address }}"
 
     - include_role:
         name: install_groupsync_from_subscription
@@ -73,11 +73,15 @@
         cluster_address: "{{ ocp_cluster_address }}"
 
   # TODO Create trident-csi as default StorageClass (FSXn)
+    - include_role:
+        name: install_trident_from_subscription
+      vars:
+        cluster_address: "{{ ocp_cluster_address }}"
 
-#    - include_role:
-#        name: install_logging_from_subscription
-#      vars:
-#        cluster_address: "{{ ocp_cluster_address }}"
+    - include_role:
+        name: install_logging_from_subscription
+      vars:
+        cluster_address: "{{ ocp_cluster_address }}"
 
     - include_role:
         name: install_acs_from_subscription
@@ -85,10 +89,10 @@
         cluster_address: "{{ ocp_cluster_address }}"
 
 # TODO Quay needs block storage available
-    - include_role:
-        name: install_quay_from_subscription
-      vars:
-        cluster_address: "{{ ocp_cluster_address }}"
+#    - include_role:
+#        name: install_quay_from_subscription
+#      vars:
+#        cluster_address: "{{ ocp_cluster_address }}"
 
 #    - include_role:
 #       name: admin_config_log_forwarder
