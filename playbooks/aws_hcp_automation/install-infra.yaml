@@ -29,4 +29,3 @@
   ansible.builtin.import_playbook: configure-day2-full.yaml
   vars:
     ocp_cluster_address: "{{ hcp_cluster_address[0] }}"
-    subnet: "{{ private_subnet_id1 }}"
