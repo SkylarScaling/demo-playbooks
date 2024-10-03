@@ -49,6 +49,7 @@
         subnet: "{{ private_subnet_id2 }}"
         machinepool_name: storage
         machinepool_labels: node-role.kubernetes.io/infra=,cluster.ocs.openshift.io/openshift-storage=
+        machinepool_taints: ''
         min_replicas: 4
         max_replicas: 4
         instance_type: m5a.xlarge
@@ -59,6 +60,7 @@
         subnet: "{{ private_subnet_id1 }}"
         machinepool_name: quay
         machinepool_labels: node-role.kubernetes.io/infra=,node-role.kubernetes.io/quay=
+        machinepool_taints: ''
         min_replicas: 3
         max_replicas: 3
         instance_type: m5a.2xlarge
