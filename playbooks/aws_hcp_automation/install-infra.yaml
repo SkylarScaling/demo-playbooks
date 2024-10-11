@@ -19,11 +19,62 @@
 #      private: yes
 #      confirm: no
   tasks:
-    - debug:
-        msg: Performing IaC Automation
+    - include_role:
+        name: admin_provision_hcp_cluster
 
-- name: Provision HCP Cluster
-  ansible.builtin.import_playbook: provision-demo-hcp-cluster.yaml
+    - name: Get Cluster Details
+      command:
+        argv:
+          - rosa
+          - describe
+          - cluster
+          - --cluster
+          - "{{ cluster_name }}"
+      register: cluster_details
+
+    - set_fact:
+        lines: "{{ cluster_details.stdout_lines }}"
+
+    - set_fact:
+        hcp_cluster_address: "{{ item | regex_search('(DNS:\\s*)(\\S*)', '\\2') }}"
+      loop: "{{ lines }}"
+      when: "item.startswith('DNS:')"
+
+    - debug:
+        msg: "{{ hcp_cluster_address[0] }}"
+
+    - include_role:
+        name: aws_config_security_groups
+
+    - name: Wait for cluster to start processing auth requests
+      shell: "oc login -u {{ cluster_admin_user }} -p {{ cluster_admin_password }} https://api.{{ hcp_cluster_address[0] }}:443"
+      retries: 20
+      delay: 30
+      register: result
+      until: result.rc == 0
+
+    - name: Wait for Nodes to be Created
+      k8s_info:
+        host: "https://api.{{ hcp_cluster_address[0] }}:443"
+        api_version: v1
+        kind: Node
+      register: output_info
+      until: (output_info.resources is defined) and (output_info.resources | length) >= 3
+      delay: 30
+      retries: 20
+
+    - name: Wait for Nodes to become Ready
+      k8s_info:
+        host: "https://api.{{ hcp_cluster_address[0] }}:443"
+        api_version: v1
+        kind: Node
+      register: output_info
+      until: (output_info.resources | json_query(query) | unique | length == 1) and (output_info.resources | json_query(query) | unique == [["True"]])
+      delay: 30
+      retries: 40
+      vars:
+        condition: 'Ready'
+        query: "[*].status.conditions[?type=='{{ condition }}'].status"
 
 - name: Perform Day 2 Configuration
   ansible.builtin.import_playbook: configure-day2-full.yaml

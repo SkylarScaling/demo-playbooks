@@ -160,7 +160,7 @@
               - "{{ cluster_name }}"
               - --hosted-cp
               - --version
-              - 4.16.6
+              - 4.16.14
               - --sts
               - --mode
               - auto

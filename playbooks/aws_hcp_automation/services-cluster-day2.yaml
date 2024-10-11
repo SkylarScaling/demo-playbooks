@@ -48,7 +48,7 @@
       vars:
         subnet: "{{ private_subnet_id2 }}"
         machinepool_name: storage
-        machinepool_labels: node-role.kubernetes.io/infra=,cluster.ocs.openshift.io/openshift-storage=
+        machinepool_labels: node-role.kubernetes.io/infra=,cluster.ocs.openshift.io/openshift-storage=,node-role.kubernetes.io/odf=
         machinepool_taints: ''
         min_replicas: 4
         max_replicas: 4
@@ -63,7 +63,7 @@
         machinepool_taints: ''
         min_replicas: 3
         max_replicas: 3
-        instance_type: m5a.2xlarge
+        instance_type: c6a.2xlarge
 
     - include_role:
         name: install_odf_from_subscription

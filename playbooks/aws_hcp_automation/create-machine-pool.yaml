@@ -16,3 +16,11 @@
     # TODO This should be specific to the environment, as needed
     - include_role:
         name: admin_config_machine_pool
+      vars:
+        subnet: "{{ private_subnet_id1 }}"
+        machinepool_name: quay-m5a
+        machinepool_labels: node-role.kubernetes.io/infra=,node-role.kubernetes.io/quay=
+        machinepool_taints: ''
+        min_replicas: 3
+        max_replicas: 3
+        instance_type: m5a.2xlarge
