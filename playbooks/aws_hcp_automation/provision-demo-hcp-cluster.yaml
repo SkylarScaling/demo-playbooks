@@ -235,7 +235,7 @@
       register: output_info
       until: (output_info.resources is defined) and (output_info.resources | length) >= 3
       delay: 30
-      retries: 20
+      retries: 40
 
     - name: Wait for Nodes to become Ready
       k8s_info:
