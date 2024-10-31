@@ -166,7 +166,7 @@
               - auto
               - --create-admin-user
               - --cluster-admin-password
-              - "RedHat123RedHat123"
+              - "{{ cluster_admin_password }}"
               - --operator-roles-prefix
               - "{{ operator_roles_prefix }}-{{ cluster_name }}"
               - --oidc-config-id

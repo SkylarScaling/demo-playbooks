@@ -90,10 +90,10 @@
       vars:
         cluster_address: "{{ ocp_cluster_address }}"
 
-    - include_role:
-        name: install_trident_from_subscription
-      vars:
-        cluster_address: "{{ ocp_cluster_address }}"
+#    - include_role:
+#        name: install_trident_from_subscription
+#      vars:
+#        cluster_address: "{{ ocp_cluster_address }}"
 
     - include_role:
         name: install_logging_from_subscription

@@ -36,22 +36,6 @@
     - include_role:
         name: admin_config_ldap
 
-    - name: Update Labels on Worker Machine Pools
-      command:
-        argv:
-          - rosa
-          - update
-          - machinepool
-          - --cluster
-          - "{{ cluster_name }}"
-          - --labels
-          - "node-role.kubernetes.io/infra="
-          - "{{ item }}"
-      loop:
-        - workers-0
-        - workers-1
-        - workers-2
-
     - include_role:
         name: admin_config_machine_pool
       vars:
