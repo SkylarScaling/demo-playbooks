@@ -147,7 +147,7 @@
           - auto
           - --hosted-cp
           - --version
-          - 4.16.14
+          - 4.17.5
           - --create-admin-user
           - --cluster-admin-password
           - "RedHat123RedHat123"
