@@ -41,33 +41,44 @@
       vars:
         subnet: "{{ private_subnet_id1 }}"
         machinepool_name: workloads-1
-        machinepool_labels: ''
+        machinepool_labels: 'node-role.kubernetes.io/load-test='
         machinepool_taints: ''
         min_replicas: 1
         max_replicas: 20
-        instance_type: r5a.xlarge
+        instance_type: m5a.xlarge
 
-    - include_role:
-        name: admin_config_machine_pool
-      vars:
-        subnet: "{{ private_subnet_id2 }}"
-        machinepool_name: workloads-2
-        machinepool_labels: ''
-        machinepool_taints: ''
-        min_replicas: 1
-        max_replicas: 20
-        instance_type: r5a.xlarge
-
-    - include_role:
-        name: admin_config_machine_pool
-      vars:
-        subnet: "{{ private_subnet_id3 }}"
-        machinepool_name: workloads-3
-        machinepool_labels: ''
-        machinepool_taints: ''
-        min_replicas: 1
-        max_replicas: 20
-        instance_type: r5a.xlarge
+#    - include_role:
+#        name: admin_config_machine_pool
+#      vars:
+#        subnet: "{{ private_subnet_id1 }}"
+#        machinepool_name: workloads-1
+#        machinepool_labels: ''
+#        machinepool_taints: ''
+#        min_replicas: 1
+#        max_replicas: 20
+#        instance_type: r5a.xlarge
+#
+#    - include_role:
+#        name: admin_config_machine_pool
+#      vars:
+#        subnet: "{{ private_subnet_id2 }}"
+#        machinepool_name: workloads-2
+#        machinepool_labels: ''
+#        machinepool_taints: ''
+#        min_replicas: 1
+#        max_replicas: 20
+#        instance_type: r5a.xlarge
+#
+#    - include_role:
+#        name: admin_config_machine_pool
+#      vars:
+#        subnet: "{{ private_subnet_id3 }}"
+#        machinepool_name: workloads-3
+#        machinepool_labels: ''
+#        machinepool_taints: ''
+#        min_replicas: 1
+#        max_replicas: 20
+#        instance_type: r5a.xlarge
 
     - include_role:
         name: admin_config_rbac
@@ -75,19 +86,26 @@
         cluster_address: "{{ ocp_cluster_address }}"
 
     - include_role:
-        name: install_openshift_pipelines
+        name: aws_create_configmap
       vars:
         cluster_address: "{{ ocp_cluster_address }}"
+        service_account_name: "{{ cluster_admin_service_account_name }}"
+        service_account_namespace: "{{ cluster_admin_service_account_namespace }}"
 
-    - include_role:
-        name: install_openshift_gitops
-      vars:
-        cluster_address: "{{ ocp_cluster_address }}"
-
-    - include_role:
-        name: install_developer_hub
-      vars:
-        cluster_address: "{{ ocp_cluster_address }}"
+#    - include_role:
+#        name: install_openshift_pipelines
+#      vars:
+#        cluster_address: "{{ ocp_cluster_address }}"
+#
+#    - include_role:
+#        name: install_openshift_gitops
+#      vars:
+#        cluster_address: "{{ ocp_cluster_address }}"
+#
+#    - include_role:
+#        name: install_developer_hub
+#      vars:
+#        cluster_address: "{{ ocp_cluster_address }}"
 
     - include_role:
         name: import_managed_cluster

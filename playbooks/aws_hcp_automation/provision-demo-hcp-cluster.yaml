@@ -25,7 +25,8 @@
           - cluster
       register: cluster_list
 
-    - debug:
+    - name: Don't provision if cluster exists
+      debug:
         msg: "Cluster {{ cluster_name }} already exists. Skipping provisioning."
       when: cluster_list.stdout_lines is search(cluster_name)
 
@@ -219,6 +220,9 @@
 
     - debug:
         msg: "{{ hcp_cluster_address[0] }}"
+
+#    - include_role:
+#        name: aws_config_security_groups
 
     - name: Wait for cluster to start processing auth requests
       shell: "oc login -u {{ cluster_admin_user }} -p {{ cluster_admin_password }} https://api.{{ hcp_cluster_address[0] }}:{{ k8s_port }}"

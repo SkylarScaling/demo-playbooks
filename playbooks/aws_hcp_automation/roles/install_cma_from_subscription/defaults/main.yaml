@@ -1,6 +1,6 @@
 ---
 subscription_repo_url: https://github.com/skylarscaling/61502-automation.git
-subscription_branch: acs-version
-app_name: acs-installer
+subscription_branch: main
+app_name: cma-installer
 app_namespace: acm-install-policies
 ...

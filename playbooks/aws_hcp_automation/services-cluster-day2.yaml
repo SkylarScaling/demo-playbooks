@@ -63,7 +63,14 @@
         machinepool_taints: ''
         min_replicas: 3
         max_replicas: 3
-        instance_type: m5a.2xlarge
+        instance_type: c5a.4xlarge
+
+    - include_role:
+        name: aws_create_configmap
+      vars:
+        cluster_address: "{{ ocp_cluster_address }}"
+        service_account_name: "{{ acm_service_account_name }}"
+        service_account_namespace: "{{ acm_service_account_namespace }}"
 
     - include_role:
         name: install_odf_from_subscription
@@ -114,3 +121,13 @@
         name: install_cost_management_from_subscription
       vars:
         cluster_address: "{{ ocp_cluster_address }}"
+
+    - include_role:
+        name: install_cma_from_subscription
+      vars:
+        cluster_address: "{{ ocp_cluster_address }}"
+
+#    - include_role:
+#        name: install_developer_hub_from_subscription
+#      vars:
+#        cluster_address: "{{ ocp_cluster_address }}"
